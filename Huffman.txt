@@ -1,0 +1,68 @@
+import heapq
+
+# Node class for Huffman Tree
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    # for priority queue comparison
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+
+# Function to print Huffman Codes
+def print_huffman_codes(node, code, huffman_codes):
+    if node is None:
+        return
+
+    # if leaf node
+    if node.char is not None:
+        huffman_codes[node.char] = code
+        return
+
+    print_huffman_codes(node.left, code + "0", huffman_codes)
+    print_huffman_codes(node.right, code + "1", huffman_codes)
+
+
+# Main Huffman Encoding function
+def huffman_encoding(char_freq):
+    heap = [Node(char, freq) for char, freq in char_freq.items()]
+    heapq.heapify(heap)  # make it a min-heap
+
+    while len(heap) > 1:
+        # Extract two nodes with smallest frequency
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+
+        # Create new internal node with combined frequency
+        new_node = Node(None, left.freq + right.freq)
+        new_node.left = left
+        new_node.right = right
+
+        # Add this node back to the heap
+        heapq.heappush(heap, new_node)
+
+    # Generate Huffman Codes
+    root = heap[0]
+    huffman_codes = {}
+    print_huffman_codes(root, "", huffman_codes)
+    return huffman_codes
+
+
+# --- Main Program ---
+n = int(input("Enter number of characters: "))
+char_freq = {}
+
+for i in range(n):
+    char = input(f"Enter character {i+1}: ")
+    freq = int(input(f"Enter frequency of '{char}': "))
+    char_freq[char] = freq
+
+codes = huffman_encoding(char_freq)
+
+print("\nHuffman Codes for given characters:")
+for char, code in codes.items():
+    print(f"{char}: {code}")
