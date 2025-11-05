@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, precision_score, recall_score, accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+df = pd.read_csv(r"C:\Users\karti\Downloads\emails.csv")
+df
+
+
+if 'Email No.' in df.columns:
+    df = df.drop('Email No.', axis=1)
+
+print("Dataset shape:", df.shape)
+print("\nTarget class distribution:\n", df['Prediction'].value_counts())
+
+X = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+
+knn = KNeighborsClassifier(n_neighbors=2)
+knn.fit(X_train, y_train)
+y_pred_knn = knn.predict(X_test)
+
+print("KNN Model Performance")
+print("Training Accuracy:", knn.score(X_train, y_train))
+print("Testing Accuracy:", knn.score(X_test, y_test))
+
+cm_knn = confusion_matrix(y_test, y_pred_knn)
+ConfusionMatrixDisplay(confusion_matrix=cm_knn).plot()
+plt.title("KNN Confusion Matrix")
+plt.show()
+
+print("\nClassification Report:\n", classification_report(y_test, y_pred_knn))
+print("Accuracy Score:", accuracy_score(y_test, y_pred_knn))
+print("Precision Score:", precision_score(y_test, y_pred_knn))
+print("Recall Score:", recall_score(y_test, y_pred_knn))
+print("Error Rate:", 1 - accuracy_score(y_test, y_pred_knn))
+
+# Support Vector Machine
+svm = SVC(gamma='auto')
+svm.fit(X_train, y_train)
+y_pred_svm = svm.predict(X_test)
+
+print("SVM Model Performance")
+print("Training Accuracy:", svm.score(X_train, y_train))
+print("Testing Accuracy:", svm.score(X_test, y_test))
+
+cm_svm = confusion_matrix(y_test, y_pred_svm)
+ConfusionMatrixDisplay(confusion_matrix=cm_svm).plot()
+plt.title("SVM Confusion Matrix")
+plt.show()
+
+print("\nClassification Report:\n", classification_report(y_test, y_pred_svm))
+print("Accuracy Score:", accuracy_score(y_test, y_pred_svm))
+print("Precision Score:", precision_score(y_test, y_pred_svm))
+print("Recall Score:", recall_score(y_test, y_pred_svm))
+print("Error Rate:", 1 - accuracy_score(y_test, y_pred_svm))
+
+
+
