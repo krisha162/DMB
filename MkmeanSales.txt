@@ -1,0 +1,53 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+
+df = pd.read_csv(r"C:\Users\karti\Downloads\sales_data_sample.csv", encoding='latin1')
+df
+
+
+print("Dataset loaded successfully!")
+print(df.head())
+
+
+#Select numeric features for clustering
+df_num = df.select_dtypes(include=['int64', 'float64']).dropna()
+
+
+# Data scaling for better clustering performance
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(df_num)
+
+
+# Determine optimal number of clusters using Elbow Method
+inertia = []
+K = range(1, 11)
+for k in K:
+    model = KMeans(n_clusters=k, random_state=42)
+    model.fit(scaled_data)
+    inertia.append(model.inertia_)
+plt.plot(K, inertia, 'bo-')
+plt.title("Elbow Method for Optimal k")
+plt.xlabel("Number of Clusters (k)")
+plt.ylabel("Inertia")
+plt.show()
+
+
+# Apply K-Means with chosen k (e.g., 3)
+kmeans = KMeans(n_clusters=3, random_state=42)
+df['Cluster'] = kmeans.fit_predict(scaled_data)
+
+
+# Display sample clustered data
+print("\nClustered Data Sample:")
+print(df[['SALES', 'QUANTITYORDERED', 'MSRP', 'Cluster']].head(10))
+
+
+# Visualize clusters (using 2 important features)
+plt.scatter(df['SALES'], df['QUANTITYORDERED'], c=df['Cluster'], cmap='viridis')
+plt.title("K-Means Clustering Visualization")
+plt.xlabel("Sales")
+plt.ylabel("Quantity Ordered")
+plt.show()
